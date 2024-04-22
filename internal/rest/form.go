@@ -1,8 +1,8 @@
 package rest
 
 import (
-	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/mikebooon/deltaform/service"
@@ -17,17 +17,27 @@ func NewFormHandler(e *echo.Echo, repo service.ServiceRepo) {
 		formService: repo.FormService,
 	}
 
-	e.GET("/form", handler.FetchForm)
+	e.GET("/form/:id", handler.FetchForm)
 }
 
 func (f *FormHandler) FetchForm(c echo.Context) error {
-	form, err := f.formService.GetByID(1)
+	idStr := c.Param("id")
+
+	if idStr == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Missing param: id")
+	}
+
+	id, err := strconv.Atoi(idStr)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid param: id")
+	}
+
+	form, err := f.formService.GetByID(uint(id))
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, "Not Found")
 	}
-
-	log.Println("test fetch form")
 
 	return c.JSON(200, form)
 }
