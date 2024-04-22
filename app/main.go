@@ -7,8 +7,10 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/mikebooon/deltaform/internal/migrate"
 	"github.com/mikebooon/deltaform/internal/rest"
+	"github.com/mikebooon/deltaform/internal/util"
 	"github.com/mikebooon/deltaform/service"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -31,9 +33,10 @@ func main() {
 
 	e := echo.New()
 
-	dbConnection := getDbConnection()
+	e.Validator = util.NewValidator()
+	e.Use(middleware.Logger(), middleware.CORS())
 
-	log.Println(dbConnection)
+	dbConnection := getDbConnection()
 
 	db, err := gorm.Open(postgres.Open(dbConnection), &gorm.Config{})
 
@@ -46,6 +49,7 @@ func main() {
 	serviceRepo := service.NewServiceRepo(*db)
 
 	rest.NewFormHandler(e, *serviceRepo)
+	rest.NewAuthHandler(e, *serviceRepo)
 
 	address := os.Getenv("SERVER_ADDRESS")
 
