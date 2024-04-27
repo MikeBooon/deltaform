@@ -32,9 +32,22 @@ func main() {
 	}
 
 	e := echo.New()
+	e.HideBanner = true
 
 	e.Validator = util.NewValidator()
-	e.Use(middleware.Logger(), middleware.CORS())
+	e.Use(middleware.CORS())
+	e.Use(middleware.Recover())
+
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus:  true,
+		LogURI:     true,
+		LogMethod:  true,
+		LogLatency: true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			log.Printf("REQ: %v | %v | %v | %v\n", v.Method, v.URI, v.Status, v.Latency)
+			return nil
+		},
+	}))
 
 	dbConnection := getDbConnection()
 

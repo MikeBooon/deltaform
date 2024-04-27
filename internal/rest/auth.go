@@ -19,7 +19,7 @@ func NewAuthHandler(e *echo.Echo, repo service.ServiceRepo) {
 		userService: repo.UserService,
 	}
 
-	e.POST("auth/send-otp", handler.SendOTP, middleware.RateLimiter(mw.SecureRateLimitStore))
+	e.POST("/auth/send-otp", handler.SendOTP, middleware.RateLimiter(mw.SecureRateLimitStore))
 }
 
 type SendOTPDTO struct {
@@ -50,6 +50,8 @@ func (h *AuthHandler) SendOTP(c echo.Context) error {
 			"Failed to generate a one time code",
 		)
 	}
+
+	log.Println(code)
 
 	// NOW TO EMAIL CODE
 
