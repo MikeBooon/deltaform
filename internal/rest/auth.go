@@ -23,6 +23,7 @@ func NewAuthHandler(e *echo.Echo, repo service.ServiceRepo, emailClient email.Em
 	}
 
 	e.POST("/auth/send-otp", handler.SendOTP, middleware.RateLimiter(mw.SecureRateLimitStore))
+	e.POST("/auth/verify-otp", handler.VerifyOTP, middleware.RateLimiter(mw.SecureRateLimitStore))
 }
 
 type SendOTPDTO struct {
@@ -46,6 +47,8 @@ func (h *AuthHandler) SendOTP(c echo.Context) error {
 
 	code, err := h.userService.GetNewVerificationCode(body.Email)
 
+	log.Println(code)
+
 	if err != nil {
 		log.Fatal(err)
 		return echo.NewHTTPError(
@@ -54,7 +57,52 @@ func (h *AuthHandler) SendOTP(c echo.Context) error {
 		)
 	}
 
-	h.emailClient.SendOTPEmail(body.Email, code)
+	err = h.emailClient.SendOTPEmail(body.Email, code)
+
+	if err != nil {
+		log.Fatal("Failed to send otp code email", err.Error())
+		return c.NoContent(http.StatusInternalServerError)
+	}
 
 	return c.NoContent(http.StatusAccepted)
+}
+
+type VerifyOTPDTO struct {
+	Code  string `json:"code" validate:"required"`
+	Email string `json:"email" validate:"required,email"`
+}
+
+func (h *AuthHandler) VerifyOTP(c echo.Context) error {
+	var body VerifyOTPDTO
+
+	err := c.Bind(&body)
+
+	if err != nil {
+		return err
+	}
+
+	err = c.Validate(body)
+
+	if err != nil {
+		return err
+	}
+
+	valid, err := h.userService.VerifyVerficationCode(body.Code, body.Email)
+
+	if err != nil {
+		log.Println(err)
+		return c.NoContent(
+			http.StatusInternalServerError,
+		)
+	}
+
+	if !valid {
+		return c.NoContent(
+			http.StatusUnauthorized,
+		)
+	}
+
+	// Create JWT token
+
+	return c.NoContent(http.StatusOK)
 }

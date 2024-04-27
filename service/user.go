@@ -2,6 +2,8 @@ package service
 
 import (
 	"database/sql"
+	"errors"
+	"log"
 	"time"
 
 	"github.com/mikebooon/deltaform/internal/auth"
@@ -55,4 +57,48 @@ func (s *UserService) GetNewVerificationCode(email string) (string, error) {
 	s.db.Save(&user)
 
 	return code, nil
+}
+
+func (s *UserService) VerifyVerficationCode(code string, email string) (bool, error) {
+	var user model.User
+
+	result := s.db.Where("email = ?", email).First(&user)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return false, ErrUserNotFoundWithEmail
+		}
+
+		return false, result.Error
+	}
+
+	if !user.VerificationCode.Valid {
+		return false, nil
+	}
+
+	if time.Now().After(user.VerificationExpires.Time) {
+		return false, nil
+	}
+
+	log.Println(code)
+
+	isValid := auth.CompareHash(user.VerificationCode.String, code)
+
+	log.Println(isValid)
+
+	if !isValid {
+		return false, nil
+	}
+
+	user.VerificationCode = sql.NullString{
+		Valid: false,
+	}
+
+	user.VerificationExpires = sql.NullTime{
+		Valid: false,
+	}
+
+	s.db.Save(&user)
+
+	return true, nil
 }

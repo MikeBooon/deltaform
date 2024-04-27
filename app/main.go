@@ -55,7 +55,7 @@ func main() {
 	db, err := gorm.Open(postgres.Open(dbConnection), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal("failed to open connection to database")
+		log.Fatal("Failed to open connection to database")
 	}
 
 	migrate.RunMigration(db)

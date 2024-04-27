@@ -37,7 +37,7 @@ func NewEmailClient(opts EmailOptions) *EmailClient {
 	}
 }
 
-func (client *EmailClient) SendOTPEmail(to string, code string) {
+func (client *EmailClient) SendOTPEmail(to string, code string) error {
 	template := getOTPEmailTemplate(code)
 
 	input := &ses.SendEmailInput{
@@ -55,4 +55,6 @@ func (client *EmailClient) SendOTPEmail(to string, code string) {
 	if err != nil {
 		log.Fatal("Failed to send email", err.Error())
 	}
+
+	return err
 }
