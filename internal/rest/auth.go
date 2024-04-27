@@ -6,17 +6,20 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mikebooon/deltaform/internal/email"
 	mw "github.com/mikebooon/deltaform/internal/rest/middleware"
 	"github.com/mikebooon/deltaform/service"
 )
 
 type AuthHandler struct {
 	userService service.UserService
+	emailClient email.EmailClient
 }
 
-func NewAuthHandler(e *echo.Echo, repo service.ServiceRepo) {
+func NewAuthHandler(e *echo.Echo, repo service.ServiceRepo, emailClient email.EmailClient) {
 	handler := &AuthHandler{
 		userService: repo.UserService,
+		emailClient: emailClient,
 	}
 
 	e.POST("/auth/send-otp", handler.SendOTP, middleware.RateLimiter(mw.SecureRateLimitStore))
@@ -51,9 +54,7 @@ func (h *AuthHandler) SendOTP(c echo.Context) error {
 		)
 	}
 
-	log.Println(code)
-
-	// NOW TO EMAIL CODE
+	h.emailClient.SendOTPEmail(body.Email, code)
 
 	return c.NoContent(http.StatusAccepted)
 }

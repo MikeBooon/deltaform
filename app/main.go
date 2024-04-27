@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/mikebooon/deltaform/internal/email"
 	"github.com/mikebooon/deltaform/internal/migrate"
 	"github.com/mikebooon/deltaform/internal/rest"
 	"github.com/mikebooon/deltaform/internal/util"
@@ -59,10 +60,16 @@ func main() {
 
 	migrate.RunMigration(db)
 
+	emailClient := email.NewEmailClient(email.EmailOptions{
+		Sender:    os.Getenv("EMAIL_SENDER_ADDRESS"),
+		AccessKey: os.Getenv("AWS_ACCESS_KEY"),
+		SecretKey: os.Getenv("AWS_SECRET_KEY"),
+	})
+
 	serviceRepo := service.NewServiceRepo(*db)
 
 	rest.NewFormHandler(e, *serviceRepo)
-	rest.NewAuthHandler(e, *serviceRepo)
+	rest.NewAuthHandler(e, *serviceRepo, *emailClient)
 
 	address := os.Getenv("SERVER_ADDRESS")
 
