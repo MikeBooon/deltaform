@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -25,6 +26,7 @@ func IsAuthenticated(next echo.HandlerFunc) echo.HandlerFunc {
 		user, err := auth.ValidateJWT(token)
 
 		if err != nil {
+			log.Println(err.Error())
 			return echo.NewHTTPError(401, "Unauthorized")
 		}
 
