@@ -87,7 +87,7 @@ func (h *AuthHandler) VerifyOTP(c echo.Context) error {
 		return err
 	}
 
-	valid, err := h.userService.VerifyVerficationCode(body.Code, body.Email)
+	valid, user, err := h.userService.VerifyVerficationCode(body.Code, body.Email)
 
 	if err != nil {
 		log.Println(err)
@@ -102,7 +102,14 @@ func (h *AuthHandler) VerifyOTP(c echo.Context) error {
 		)
 	}
 
-	// Create JWT token
+	token, err := h.userService.NewUserJWT(user.Email, user.ID)
 
-	return c.NoContent(http.StatusOK)
+	if err != nil {
+		log.Fatal(err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"token": token,
+	})
 }

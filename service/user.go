@@ -3,7 +3,6 @@ package service
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"time"
 
 	"github.com/mikebooon/deltaform/internal/auth"
@@ -12,7 +11,8 @@ import (
 )
 
 type UserService struct {
-	db *gorm.DB
+	db        *gorm.DB
+	jwtSecret string
 }
 
 const (
@@ -59,35 +59,31 @@ func (s *UserService) GetNewVerificationCode(email string) (string, error) {
 	return code, nil
 }
 
-func (s *UserService) VerifyVerficationCode(code string, email string) (bool, error) {
+func (s *UserService) VerifyVerficationCode(code string, email string) (bool, model.User, error) {
 	var user model.User
 
 	result := s.db.Where("email = ?", email).First(&user)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			return false, ErrUserNotFoundWithEmail
+			return false, user, ErrUserNotFoundWithEmail
 		}
 
-		return false, result.Error
+		return false, user, result.Error
 	}
 
 	if !user.VerificationCode.Valid {
-		return false, nil
+		return false, user, nil
 	}
 
 	if time.Now().After(user.VerificationExpires.Time) {
-		return false, nil
+		return false, user, nil
 	}
-
-	log.Println(code)
 
 	isValid := auth.CompareHash(user.VerificationCode.String, code)
 
-	log.Println(isValid)
-
 	if !isValid {
-		return false, nil
+		return false, user, nil
 	}
 
 	user.VerificationCode = sql.NullString{
@@ -100,5 +96,12 @@ func (s *UserService) VerifyVerficationCode(code string, email string) (bool, er
 
 	s.db.Save(&user)
 
-	return true, nil
+	return true, user, nil
+}
+
+func (s *UserService) NewUserJWT(email string, userId string) (string, error) {
+	return auth.GenerateJWT(auth.JWTBody{
+		Email: email,
+		ID:    userId,
+	})
 }

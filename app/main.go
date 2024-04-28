@@ -56,6 +56,7 @@ func main() {
 
 	if err != nil {
 		log.Fatal("Failed to open connection to database")
+		os.Exit(1)
 	}
 
 	migrate.RunMigration(db)
@@ -70,6 +71,7 @@ func main() {
 
 	rest.NewFormHandler(e, *serviceRepo)
 	rest.NewAuthHandler(e, *serviceRepo, *emailClient)
+	rest.NewUserHandler(e, *serviceRepo)
 
 	address := os.Getenv("SERVER_ADDRESS")
 
