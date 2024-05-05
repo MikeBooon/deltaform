@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/mikebooon/deltaform/enums"
+	"github.com/mikebooon/deltaform/domain"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +9,7 @@ type Form struct {
 	gorm.Model
 	Title     string
 	Block     []Block
-	StatusID  enums.FormStatus
+	StatusID  domain.FormStatus
 	Status    FormStatus
 	UserID    string
 	User      User

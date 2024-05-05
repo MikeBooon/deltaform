@@ -1,4 +1,4 @@
-package enums
+package domain
 
 type FormStatus string
 

@@ -1,10 +1,10 @@
 package model
 
-import "github.com/mikebooon/deltaform/enums"
+import "github.com/mikebooon/deltaform/domain"
 
 type Field struct {
 	ID          string `gorm:"primarykey;type:uuid;default:gen_random_uuid()"`
-	TypeID      enums.InputType
+	TypeID      domain.InputType
 	Type        InputType
 	Title       string
 	Description string

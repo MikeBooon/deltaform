@@ -1,7 +1,7 @@
 package migrate
 
 import (
-	"github.com/mikebooon/deltaform/enums"
+	"github.com/mikebooon/deltaform/domain"
 	"github.com/mikebooon/deltaform/internal/db/model"
 	"gorm.io/gorm"
 )
@@ -18,11 +18,11 @@ func RunMigration(db *gorm.DB) {
 		&model.FieldResponse{},
 	)
 
-	for _, id := range enums.InputTypeOptions {
+	for _, id := range domain.InputTypeOptions {
 		db.FirstOrCreate(&model.InputType{ID: string(id)})
 	}
 
-	for _, id := range enums.FormStatusOptions {
+	for _, id := range domain.FormStatusOptions {
 		db.FirstOrCreate(&model.FormStatus{ID: string(id)})
 	}
 }
