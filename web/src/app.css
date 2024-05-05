@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    font-size: 18px;
+    @apply antialiased bg-base text-base-content;
+}
