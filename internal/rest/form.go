@@ -17,10 +17,10 @@ func NewFormHandler(e *echo.Echo, repo service.ServiceRepo) {
 		formService: repo.FormService,
 	}
 
-	e.GET("/form/:id", handler.FetchForm)
+	e.GET("/form/:id", handler.get)
 }
 
-func (f *FormHandler) FetchForm(c echo.Context) error {
+func (f *FormHandler) get(c echo.Context) error {
 	idStr := c.Param("id")
 
 	if idStr == "" {

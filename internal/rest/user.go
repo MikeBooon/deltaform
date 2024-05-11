@@ -16,10 +16,10 @@ func NewUserHandler(e *echo.Echo, repo service.ServiceRepo) {
 		userService: repo.UserService,
 	}
 
-	e.GET("/user/me", handler.Me, middleware.IsAuthenticated)
+	e.GET("/user/me", handler.me, middleware.IsAuthenticated)
 }
 
-func (h *UserHandler) Me(c echo.Context) error {
+func (h *UserHandler) me(c echo.Context) error {
 	user := c.Get("user").(domain.User)
 
 	if user == (domain.User{}) {

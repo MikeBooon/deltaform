@@ -22,15 +22,15 @@ func NewAuthHandler(e *echo.Echo, repo service.ServiceRepo, emailClient email.Em
 		emailClient: emailClient,
 	}
 
-	e.POST("/auth/send-otp", handler.SendOTP, middleware.RateLimiter(mw.SecureRateLimitStore))
-	e.POST("/auth/verify-otp", handler.VerifyOTP, middleware.RateLimiter(mw.SecureRateLimitStore))
+	e.POST("/auth/send-otp", handler.sendOTP, middleware.RateLimiter(mw.SecureRateLimitStore))
+	e.POST("/auth/verify-otp", handler.verifyOTP, middleware.RateLimiter(mw.SecureRateLimitStore))
 }
 
 type SendOTPDTO struct {
 	Email string `json:"email" validate:"required,email"`
 }
 
-func (h *AuthHandler) SendOTP(c echo.Context) error {
+func (h *AuthHandler) sendOTP(c echo.Context) error {
 	var body SendOTPDTO
 
 	err := c.Bind(&body)
@@ -72,7 +72,7 @@ type VerifyOTPDTO struct {
 	Email string `json:"email" validate:"required,email"`
 }
 
-func (h *AuthHandler) VerifyOTP(c echo.Context) error {
+func (h *AuthHandler) verifyOTP(c echo.Context) error {
 	var body VerifyOTPDTO
 
 	err := c.Bind(&body)
