@@ -4,11 +4,11 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				'base-content': '#FFFFFF',
-				base: '#282943',
-				primary: '#F8B85D',
-				secondary: '#E46B3F',
-				accent: '#C6412A'
+				'base-content': '#000000',
+				base: '#FFFFFF',
+				primary: '#540D6E',
+				secondary: '#EE4266',
+				accent: '#FFD23F'
 			},
 			fontFamily: {
 				header: 'Arvo, serif',

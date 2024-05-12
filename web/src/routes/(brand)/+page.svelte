@@ -1,14 +1,22 @@
+<script lang="ts">
+	import landingArt from '$lib/assets/landing-art.svg';
+</script>
+
 <div class="m-auto h-[calc(100vh-7em)] max-w-screen-xl p-4">
-	<div class="flex h-full items-center">
+	<div class="div flex h-full flex-row items-center">
 		<div class="mx-10">
-			<h1 class="font-header text-6xl">
-				<span class="text-primary">Forms</span> at the Speed of Thought!
+			<h1 class="font-header text-4xl md:text-6xl">
+				<span class="text-secondary">Forms</span> at the Speed of Thought!
 			</h1>
-			<p class="mt-3">
+			<p class="mb-8 mt-3">
 				Experience the convenience of lightning-fast form creation, all for free with our
 				open-source solution.
 			</p>
+			<a href="/login" class="bg-primary rounded-md p-2 px-6 text-base text-xl font-semibold"
+				>Get Started Now!</a
+			>
 		</div>
+		<img class="hidden h-72 lg:block" alt="forms landing artwork" src={landingArt} />
 	</div>
 </div>
 
